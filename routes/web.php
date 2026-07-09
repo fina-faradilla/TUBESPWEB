@@ -3,6 +3,7 @@
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,6 +22,10 @@ Route::middleware('auth')->group(function () {
     // otomatis diarahkan ke halaman login (lalu kembali ke halaman ini setelah berhasil masuk).
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/create', [LaporanController::class, 'create'])->name('laporan.create');
+    
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/admin.php';
+
