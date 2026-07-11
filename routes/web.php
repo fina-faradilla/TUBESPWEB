@@ -1,16 +1,15 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Resource route otomatis meng-cover: index, create, store, show, edit, update, destroy
+Route::resource('laporan', LaporanController::class);
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Contoh: arahkan halaman utama ke daftar laporan
+Route::get('/', [LaporanController::class, 'index'])->name('home');
 
+<<<<<<< HEAD
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -21,3 +20,12 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
 
+=======
+
+Route::get('/laporan/{id}', [LaporanController::class, 'show'])
+    ->name('laporan.show');
+
+Route::get('laporan-sampah', [LaporanController::class, 'trashed'])->name('laporan.trashed');
+Route::patch('laporan/{id}/restore', [LaporanController::class, 'restore'])->name('laporan.restore');
+Route::delete('laporan/{id}/force-delete', [LaporanController::class, 'forceDelete'])->name('laporan.forceDelete');
+>>>>>>> origin/desti
