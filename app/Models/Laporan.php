@@ -30,8 +30,8 @@ class Laporan extends Model
     // Daftar status yang valid, urut sesuai alur proses.
     public const STATUS_OPTIONS = ['BARU', 'DIVERIFIKASI', 'DIPROSES', 'SELESAI'];
 
-    // Daftar kategori kerusakan.
-    public const KATEGORI_OPTIONS = ['Berlubang', 'Retak', 'Jembatan', 'Ambles', 'Lainnya'];
+    // Daftar kategori kerusakan sekarang dikelola lewat model Kategori (tabel `kategoris`).
+    // Lihat App\Models\Kategori.
 
     /**
      * Warna badge Tailwind sesuai status (dipakai di view).

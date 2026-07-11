@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\LaporanController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,4 +33,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/manage-report/{laporan}', [LaporanController::class, 'destroy'])->name('laporan.destroy');
     Route::patch('/manage-report/{laporan}/verifikasi', [LaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
     Route::get('/manage-report/{laporan}', [LaporanController::class, 'show'])->name('laporan.show');
+
+    Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');
+    Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
+    Route::put('/kategori/{kategori}', [KategoriController::class, 'update'])->name('kategori.update');
+    Route::delete('/kategori/{kategori}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
 });

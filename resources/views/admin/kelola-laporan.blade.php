@@ -100,7 +100,7 @@
             Menampilkan {{ $laporans->count() }} dari {{ $totalKeseluruhan }} laporan
         </p>
 
-        <div class="pagination">{{ $laporans->links() }}</div>
+        {{ $laporans->links('vendor.pagination.custom-dark') }}
     </div>
 
     {{-- ===== MODAL TAMBAH ===== --}}
@@ -140,6 +140,25 @@
     @push('scripts')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        const KATEGORI_OPTIONS_BAKU = @json($kategoriOptions);
+
+        // Tampilkan/sembunyikan kolom "Kategori Lainnya" sesuai pilihan select.
+        function toggleKategoriLain(selectEl) {
+            const prefix = selectEl.id.replace('kategori', '');
+            const wrap = document.getElementById(prefix + 'kategori_lainnya_wrap');
+            const input = document.getElementById(prefix + 'kategori_lainnya');
+            if (!wrap || !input) return;
+
+            if (selectEl.value === 'Lainnya') {
+                wrap.style.display = '';
+                input.required = true;
+            } else {
+                wrap.style.display = 'none';
+                input.required = false;
+                input.value = '';
+            }
+        }
+
         function openModal(id) { document.getElementById(id).classList.add('open'); initMapFor(id); }
         function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
@@ -148,7 +167,19 @@
             form.action = "{{ url('admin/manage-report') }}/" + laporan.id;
             document.getElementById('edit_judul').value = laporan.judul;
             document.getElementById('edit_pelapor').value = laporan.pelapor;
-            document.getElementById('edit_kategori').value = laporan.kategori;
+
+            const kategoriSelect = document.getElementById('edit_kategori');
+            if (KATEGORI_OPTIONS_BAKU.includes(laporan.kategori)) {
+                // Kategori baku (mis. Berlubang, Retak, dst).
+                kategoriSelect.value = laporan.kategori;
+                toggleKategoriLain(kategoriSelect);
+            } else {
+                // Kategori kustom hasil isian manual sebelumnya -> pilih "Lainnya" + isi teksnya.
+                kategoriSelect.value = 'Lainnya';
+                toggleKategoriLain(kategoriSelect);
+                document.getElementById('edit_kategori_lainnya').value = laporan.kategori;
+            }
+
             document.getElementById('edit_status').value = laporan.status;
             document.getElementById('edit_tanggal').value = laporan.tanggal.substring(0, 10);
             document.getElementById('edit_alamat').value = laporan.alamat || '';

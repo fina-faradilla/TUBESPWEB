@@ -12,11 +12,18 @@
 
 <div class="form-group">
     <label for="{{ $prefix }}kategori">Kategori</label>
-    <select id="{{ $prefix }}kategori" name="kategori" required>
-        @foreach (\App\Models\Laporan::KATEGORI_OPTIONS as $opt)
+    <select id="{{ $prefix }}kategori" name="kategori" required onchange="toggleKategoriLain(this)">
+        @foreach (($kategoriOptions ?? []) as $opt)
             <option value="{{ $opt }}">{{ $opt }}</option>
         @endforeach
+        <option value="Lainnya">Lainnya (isi manual)</option>
     </select>
+</div>
+
+<div class="form-group" id="{{ $prefix }}kategori_lainnya_wrap" style="display:none;">
+    <label for="{{ $prefix }}kategori_lainnya">Kategori Lainnya (isi manual)</label>
+    <input type="text" id="{{ $prefix }}kategori_lainnya" name="kategori_lainnya"
+           placeholder="mis. Trotoar Rusak" maxlength="255">
 </div>
 
 <div class="form-group">

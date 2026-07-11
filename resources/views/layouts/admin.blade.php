@@ -31,6 +31,10 @@
            class="nav-item {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
             <span class="dot"></span>Kelola Laporan
         </a>
+        <a href="{{ route('admin.kategori.index') }}"
+           class="nav-item {{ request()->routeIs('admin.kategori.*') ? 'active' : '' }}">
+            <span class="dot"></span>Kelola Kategori
+        </a>
 
         {{-- ===== LOGOUT ===== --}}
         <div class="sidebar-footer">

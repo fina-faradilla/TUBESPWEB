@@ -667,3 +667,46 @@ select.filter-select:focus {
         transform: translateX(0);
     }
 }
+
+/* ===== Pagination (custom-dark) ===== */
+.pagination-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.pagination-nav .page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 6px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    font-size: 13px;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.pagination-nav a.page-link:hover {
+    background: var(--sidebar-bg);
+    color: var(--text-primary);
+    border-color: var(--gold);
+}
+
+.pagination-nav .page-link.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #1b1e27;
+    font-weight: 600;
+}
+
+.pagination-nav .page-link.disabled {
+    opacity: 0.4;
+    cursor: default;
+}
