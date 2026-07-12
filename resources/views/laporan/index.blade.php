@@ -63,7 +63,7 @@
                         </td>
                         <td class="px-5 py-3 text-slate-400 text-xs">{{ $laporan->alamat }}</td>
                         <td class="px-5 py-3">
-                            <span class="text-xs font-semibold px-2 py-1 rounded-full bg-slate-500/15 text-slate-300 border border-slate-500/40">
+                            <span class="text-xs font-semibold px-2 py-1 rounded-full border {{ $laporan->statusBadgeColor() }}">
                                 {{ $laporan->status ?? 'Menunggu Verifikasi' }}
                             </span>
                         </td>

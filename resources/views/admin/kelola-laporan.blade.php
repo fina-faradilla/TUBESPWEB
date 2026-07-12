@@ -34,27 +34,35 @@
             <thead>
                 <tr>
                     <th>ID</th><th>JUDUL</th><th>PELAPOR</th><th>KATEGORI</th>
-                    <th>STATUS</th><th>TANGGAL</th><th>AKSI</th>
+                    <th>DESKRIPSI</th><th>STATUS</th><th>TANGGAL</th><th>AKSI</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($laporans as $laporan)
                     <tr>
-                        <td>{{ $laporan->kode }}</td>
+                        <td>{{ $laporan->kode_laporan }}</td>
                         <td>
                             <a href="{{ route('admin.laporan.show', $laporan) }}"
                                style="color:var(--text-primary); text-decoration:none;">
                                 {{ $laporan->judul }}
                             </a>
                         </td>
-                        <td>{{ $laporan->pelapor }}</td>
+                        <td>
+                            {{ $laporan->nama_pelapor }}
+                            @if ($laporan->user_id)
+                                <span title="Laporan dari akun warga" style="color:var(--text-secondary); font-size:11px;">(warga)</span>
+                            @endif
+                        </td>
                         <td>{{ $laporan->kategori }}</td>
+                        <td style="max-width:220px; white-space:normal; color:var(--text-secondary); font-size:12px;">
+                            {{ $laporan->deskripsi ? \Illuminate\Support\Str::limit($laporan->deskripsi, 80) : '—' }}
+                        </td>
                         <td>
                             <span class="badge {{ $laporan->statusColorClass() }}">
                                 <span class="dot"></span>{{ $laporan->status }}
                             </span>
                         </td>
-                        <td>{{ $laporan->tanggal->translatedFormat('d M Y') }}</td>
+                        <td>{{ $laporan->created_at->translatedFormat('d M Y') }}</td>
                         <td>
                             {{-- Detail --}}
                            <a href="{{ route('admin.laporan.show', $laporan) }}"
@@ -66,8 +74,8 @@
                             <form method="POST" action="{{ route('admin.laporan.verifikasi', $laporan) }}">
                                 @csrf @method('PATCH')
                                 <button type="submit"
-                                        class="aksi-link aksi-verifikasi {{ $laporan->status === 'SELESAI' ? 'disabled' : '' }}"
-                                        {{ $laporan->status === 'SELESAI' ? 'disabled' : '' }}>
+                                        class="aksi-link aksi-verifikasi {{ in_array($laporan->status, ['Selesai', 'Ditolak']) ? 'disabled' : '' }}"
+                                        {{ in_array($laporan->status, ['Selesai', 'Ditolak']) ? 'disabled' : '' }}>
                                     Verifikasi
                                 </button>
                             </form>
@@ -80,7 +88,7 @@
 
                             {{-- Hapus --}}
                             <form method="POST" action="{{ route('admin.laporan.destroy', $laporan) }}"
-                                  onsubmit="return confirm('Laporan &quot;{{ $laporan->judul }}&quot; ({{ $laporan->kode }}) akan dihapus permanen. Lanjutkan?');">
+                                  onsubmit="return confirm('Laporan &quot;{{ $laporan->judul }}&quot; ({{ $laporan->kode_laporan }}) akan dihapus permanen. Lanjutkan?');">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="aksi-link aksi-hapus">Hapus</button>
                             </form>
@@ -88,7 +96,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" style="text-align:center; color:var(--text-secondary); padding:32px 0;">
+                        <td colspan="8" style="text-align:center; color:var(--text-secondary); padding:32px 0;">
                             Tidak ada laporan yang cocok dengan pencarian/filter.
                         </td>
                     </tr>
@@ -166,7 +174,18 @@
             const form = document.getElementById('form-ubah');
             form.action = "{{ url('admin/manage-report') }}/" + laporan.id;
             document.getElementById('edit_judul').value = laporan.judul;
-            document.getElementById('edit_pelapor').value = laporan.pelapor;
+
+            // Pelapor: kalau laporan berasal dari akun warga, tampilkan nama akunnya
+            // tapi kunci (readonly) supaya tidak bisa "dipalsukan" lewat form admin.
+            const pelaporInput = document.getElementById('edit_pelapor');
+            pelaporInput.value = laporan.nama_pelapor || laporan.pelapor || '';
+            if (laporan.user_id) {
+                pelaporInput.setAttribute('readonly', 'readonly');
+                pelaporInput.title = 'Laporan ini berasal dari akun warga, nama pelapor mengikuti akun tersebut.';
+            } else {
+                pelaporInput.removeAttribute('readonly');
+                pelaporInput.title = '';
+            }
 
             const kategoriSelect = document.getElementById('edit_kategori');
             if (KATEGORI_OPTIONS_BAKU.includes(laporan.kategori)) {
@@ -180,8 +199,9 @@
                 document.getElementById('edit_kategori_lainnya').value = laporan.kategori;
             }
 
+            document.getElementById('edit_tingkat').value = laporan.tingkat || 'Sedang';
             document.getElementById('edit_status').value = laporan.status;
-            document.getElementById('edit_tanggal').value = laporan.tanggal.substring(0, 10);
+            document.getElementById('edit_deskripsi').value = laporan.deskripsi || '';
             document.getElementById('edit_alamat').value = laporan.alamat || '';
             document.getElementById('edit_latitude').value = laporan.latitude || '';
             document.getElementById('edit_longitude').value = laporan.longitude || '';

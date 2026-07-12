@@ -11,12 +11,12 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $total = Laporan::count();
-        $menungguVerifikasi = Laporan::where('status', 'BARU')->count();
-        $sedangDiproses = Laporan::where('status', 'DIPROSES')->count();
-        $selesai = Laporan::where('status', 'SELESAI')->count();
+        $menungguVerifikasi = Laporan::where('status', 'Menunggu Verifikasi')->count();
+        $sedangDiproses = Laporan::where('status', 'Diproses')->count();
+        $selesai = Laporan::where('status', 'Selesai')->count();
         $persenSelesai = $total === 0 ? 0 : round(($selesai / $total) * 100);
 
-        $terbaru = Laporan::orderByDesc('tanggal')->orderByDesc('id')->take(4)->get();
+        $terbaru = Laporan::with('user')->latest()->take(4)->get();
 
         // Tren 6 bulan terakhir berdasarkan jumlah laporan per bulan.
         $trend = [];
@@ -24,8 +24,8 @@ class DashboardController extends Controller
             $bulan = now()->subMonths($i);
             $trend[] = [
                 'label' => $this->bulanPendek($bulan->month),
-                'value' => Laporan::whereYear('tanggal', $bulan->year)
-                    ->whereMonth('tanggal', $bulan->month)
+                'value' => Laporan::whereYear('created_at', $bulan->year)
+                    ->whereMonth('created_at', $bulan->month)
                     ->count(),
             ];
         }

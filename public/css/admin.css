@@ -10,6 +10,7 @@
     --blue: #4e8cf5;
     --orange: #f2994a;
     --amber-badge: #cf9a3b;
+    --red: #e5484d;
 }
 
 * {
@@ -307,6 +308,13 @@ body {
 .badge-selesai .dot {
     background: var(--green);
 }
+.badge-ditolak {
+    color: var(--red);
+    background: rgba(229, 72, 77, 0.15);
+}
+.badge-ditolak .dot {
+    background: var(--red);
+}
 
 /* ===== Filter bar / table (Kelola Laporan) ===== */
 .filter-bar {
@@ -551,8 +559,23 @@ select.filter-select:focus {
         border-color 0.15s ease,
         box-shadow 0.15s ease;
 }
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--bg-dark);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
     outline: none;
     border-color: var(--gold);
     box-shadow: 0 0 0 3px rgba(242, 169, 59, 0.15);

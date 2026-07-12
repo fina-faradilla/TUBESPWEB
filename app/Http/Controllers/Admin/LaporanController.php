@@ -13,14 +13,17 @@ class LaporanController extends Controller
     /** Halaman "Kelola Laporan" — tabel + pencarian + filter. */
     public function index(Request $request)
     {
-        $query = Laporan::query();
+        // Sumber data sama persis dengan yang dipakai warga (tabel `laporans`),
+        // jadi laporan yang dikirim warga langsung muncul di sini.
+        $query = Laporan::with('user')->latest();
 
         if ($request->filled('q')) {
             $q = $request->string('q');
             $query->where(function ($sub) use ($q) {
                 $sub->where('judul', 'like', "%{$q}%")
                     ->orWhere('pelapor', 'like', "%{$q}%")
-                    ->orWhere('kode', 'like', "%{$q}%");
+                    ->orWhere('alamat', 'like', "%{$q}%")
+                    ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$q}%"));
             });
         }
 
@@ -33,7 +36,7 @@ class LaporanController extends Controller
         }
 
         $totalKeseluruhan = Laporan::count();
-        $laporans = $query->orderByDesc('tanggal')->orderByDesc('id')->paginate(4)->withQueryString();
+        $laporans = $query->paginate(4)->withQueryString();
         $kategoriOptions = Kategori::orderBy('nama')->pluck('nama')->toArray();
 
         return view('admin.kelola-laporan', [
@@ -47,16 +50,15 @@ class LaporanController extends Controller
         ]);
     }
 
-    /** Simpan laporan baru (dari modal "Tambah Manual"). */
+    /** Simpan laporan baru (dari modal "Tambah Manual"). Laporan manual tidak terikat akun warga. */
     public function store(Request $request)
     {
         $data = $this->validated($request);
+        $data['pelapor'] = $data['pelapor'] !== '' ? $data['pelapor'] : 'Admin (manual)';
 
         if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')->store('laporan-foto', 'public');
         }
-
-        $data['kode'] = Laporan::generateKode();
 
         Laporan::create($data);
 
@@ -68,6 +70,14 @@ class LaporanController extends Controller
     public function update(Request $request, Laporan $laporan)
     {
         $data = $this->validated($request);
+
+        if ($laporan->user_id) {
+            // Laporan berasal dari akun warga: nama pelapor mengikuti akun itu,
+            // jadi jangan ditimpa oleh isian manual di form.
+            unset($data['pelapor']);
+        } else {
+            $data['pelapor'] = $data['pelapor'] !== '' ? $data['pelapor'] : 'Admin (manual)';
+        }
 
         if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')->store('laporan-foto', 'public');
@@ -112,17 +122,20 @@ class LaporanController extends Controller
 
         $data = $request->validate([
             'judul'            => ['required', 'string', 'max:255'],
-            'pelapor'          => ['required', 'string', 'max:255'],
+            'pelapor'          => ['nullable', 'string', 'max:255'],
             'kategori'         => ['required', 'string', Rule::in($kategoriTerdaftar)],
             'kategori_lainnya' => ['required_if:kategori,Lainnya', 'nullable', 'string', 'max:100'],
+            'tingkat'          => ['required', 'in:Ringan,Sedang,Berat'],
             'status'           => ['required', Rule::in(Laporan::STATUS_OPTIONS)],
-            'tanggal'          => ['required', 'date'],
+            'deskripsi'        => ['nullable', 'string'],
 
             'alamat'    => ['nullable', 'string', 'max:255'],
             'latitude'  => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'foto'      => ['nullable', 'image', 'max:4096'],
         ]);
+
+        $data['pelapor'] = trim((string) ($data['pelapor'] ?? ''));
 
         // Kalau user pilih "Lainnya", pakai teks yang diketik manual sebagai kategori
         // sebenarnya, lalu daftarkan sebagai kategori baru supaya tidak "hilang" dan

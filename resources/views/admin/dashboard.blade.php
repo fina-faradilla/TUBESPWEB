@@ -52,16 +52,8 @@
             <div class="card-title">LAPORAN TERBARU</div>
             @forelse ($terbaru as $l)
                 <div class="terbaru-item">
-                    <div class="terbaru-text">{{ $l->judul }} — {{ $l->pelapor }}</div>
-                    @php
-                        $badgeClass = [
-                            'BARU' => 'badge-baru',
-                            'DIPROSES' => 'badge-diproses',
-                            'DIVERIFIKASI' => 'badge-diverifikasi',
-                            'SELESAI' => 'badge-selesai',
-                        ][$l->status] ?? '';
-                    @endphp
-                    <span class="badge {{ $badgeClass }}"><span class="dot"></span>{{ $l->status }}</span>
+                    <div class="terbaru-text">{{ $l->judul }} — {{ $l->nama_pelapor }}</div>
+                    <span class="badge {{ $l->statusColorClass() }}"><span class="dot"></span>{{ $l->status }}</span>
                 </div>
             @empty
                 <p style="color:var(--text-secondary); font-size:13px;">Belum ada laporan.</p>

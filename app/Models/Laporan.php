@@ -4,94 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-<<<<<<< HEAD
-
-class Laporan extends Model
-{
-    use HasFactory;
-
-    protected $fillable = [
-        'kode',
-        'judul',
-        'pelapor',
-        'kategori',
-        'status',
-        'tanggal',
-        'foto',
-        'latitude',
-        'longitude',
-        'alamat',
-        
-    ];
-
-    protected $casts = [
-        'tanggal' => 'date',
-    ];
-
-    // Daftar status yang valid, urut sesuai alur proses.
-    public const STATUS_OPTIONS = ['BARU', 'DIVERIFIKASI', 'DIPROSES', 'SELESAI'];
-
-    // Daftar kategori kerusakan sekarang dikelola lewat model Kategori (tabel `kategoris`).
-    // Lihat App\Models\Kategori.
-
-    /**
-     * Warna badge Tailwind sesuai status (dipakai di view).
-     */
-    public function statusColorClass(): string
-    {
-        return match ($this->status) {
-            'BARU'         => 'badge-baru',
-            'DIPROSES'     => 'badge-diproses',
-            'DIVERIFIKASI' => 'badge-diverifikasi',
-            'SELESAI'      => 'badge-selesai',
-            default        => '',
-        };
-    }
-
-    /**
-     * Status berikutnya dalam alur BARU -> DIVERIFIKASI -> DIPROSES -> SELESAI.
-     * Null jika sudah di status terakhir.
-     */
-    public function statusBerikutnya(): ?string
-    {
-        $idx = array_search($this->status, self::STATUS_OPTIONS, true);
-        if ($idx === false || $idx === count(self::STATUS_OPTIONS) - 1) {
-            return null;
-        }
-        return self::STATUS_OPTIONS[$idx + 1];
-    }
-
-    /**
-     * Generate kode laporan berikutnya, mis. JK-0144.
-     */
-    /**
-     * Generate kode laporan berikutnya, mis. RF-0144.
-     * Diambil dari angka KODE terbesar yang ada (bukan id terakhir),
-     * supaya tidak bentrok kalau urutan insert id tidak sejalan dengan urutan kode.
-     */
-    public static function generateKode(): string
-    {
-        $maxNumber = static::query()
-            ->selectRaw("MAX(CAST(SUBSTRING(kode, 4) AS UNSIGNED)) as max_num")
-            ->value('max_num');
-
-        $lastNumber = $maxNumber ?? 143;
-
-        return 'RF-' . str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-    }
-
-public function fotoUrl(): ?string
-{
-    return $this->foto ? asset('storage/' . $this->foto) : null;
-}
-
-public function punyaLokasi(): bool
-{
-    return $this->latitude !== null && $this->longitude !== null;
-}
-}
-=======
-use Illuminate\Database\Eloquent\SoftDeletes; 
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Laporan extends Model
 {
@@ -100,7 +13,10 @@ class Laporan extends Model
     protected $table = 'laporans';
 
     protected $fillable = [
+        'kode',
+        'tanggal',
         'user_id',
+        'pelapor',
         'judul',
         'kategori',
         'tingkat',
@@ -112,6 +28,42 @@ class Laporan extends Model
         'status',
     ];
 
+    /**
+     * Auto-generate kolom wajib (`kode`, `tanggal`, `pelapor`) setiap kali laporan baru
+     * dibuat, dari manapun (form warga ATAU form admin "Tambah Manual"), supaya kedua
+     * controller tidak perlu mengisinya manual satu-satu dan tidak gampang lupa lagi.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (Laporan $laporan) {
+            if (empty($laporan->kode)) {
+                $laporan->kode = 'JK-' . str_pad((int) (static::max('id') + 1), 4, '0', STR_PAD_LEFT);
+            }
+            if (empty($laporan->tanggal)) {
+                $laporan->tanggal = now()->toDateString();
+            }
+            if (empty($laporan->pelapor)) {
+                $laporan->pelapor = optional(auth()->user())->name ?? 'Anonim';
+            }
+        });
+    }
+
+    // Supaya kode_laporan & nama_pelapor ikut muncul saat model di-@json() ke JavaScript
+    // (dipakai modal "Ubah" di halaman Kelola Laporan admin).
+    protected $appends = ['kode_laporan', 'nama_pelapor'];
+
+    // Daftar status yang valid, urut sesuai alur proses.
+    // "Ditolak" bukan bagian dari alur maju otomatis (statusBerikutnya), hanya bisa
+    // dipilih manual lewat form "Ubah" di admin.
+    public const STATUS_OPTIONS = ['Menunggu Verifikasi', 'Diproses', 'Selesai', 'Ditolak'];
+
+    // Urutan alur status yang dipakai tombol "Verifikasi" untuk maju satu tahap.
+    private const STATUS_FLOW = ['Menunggu Verifikasi', 'Diproses', 'Selesai'];
+
+    /**
+     * Laporan ini dibuat oleh akun warga yang mana (nullable — laporan manual
+     * yang ditambahkan admin lewat "Tambah Manual" tidak selalu punya akun warga).
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -122,12 +74,26 @@ class Laporan extends Model
         return $this->hasMany(TindakLanjut::class)->orderBy('created_at');
     }
 
+    /**
+     * Nama pelapor untuk ditampilkan: kalau laporan berasal dari akun warga,
+     * pakai nama akun itu (selalu akurat & tidak bisa "dipalsukan" lewat form).
+     * Kalau laporan dibuat manual oleh admin (tidak ada akun warga), pakai
+     * kolom `pelapor` yang diisi manual saat itu.
+     */
+    public function getNamaPelaporAttribute(): string
+    {
+        return $this->user?->name ?? $this->pelapor ?? '—';
+    }
+
     // Kode laporan otomatis, contoh: RF-0142
     public function getKodeLaporanAttribute(): string
     {
         return sprintf('RF-%04d', $this->id);
     }
 
+    /**
+     * Warna badge Tailwind (dipakai di view sisi warga).
+     */
     public function tingkatBadgeColor(): string
     {
         return match ($this->tingkat) {
@@ -148,5 +114,41 @@ class Laporan extends Model
             default                => 'bg-gray-500/20 text-gray-300 border border-gray-500/40',
         };
     }
+
+    /**
+     * Warna badge Tailwind versi admin (kelas CSS di public/css/admin.css).
+     */
+    public function statusColorClass(): string
+    {
+        return match ($this->status) {
+            'Menunggu Verifikasi' => 'badge-diverifikasi',
+            'Diproses'             => 'badge-diproses',
+            'Selesai'              => 'badge-selesai',
+            'Ditolak'              => 'badge-ditolak',
+            default                => '',
+        };
+    }
+
+    /**
+     * Status berikutnya dalam alur Menunggu Verifikasi -> Diproses -> Selesai.
+     * Null jika sudah di status terakhir (Selesai) atau kalau laporan sudah Ditolak.
+     */
+    public function statusBerikutnya(): ?string
+    {
+        $idx = array_search($this->status, self::STATUS_FLOW, true);
+        if ($idx === false || $idx === count(self::STATUS_FLOW) - 1) {
+            return null;
+        }
+        return self::STATUS_FLOW[$idx + 1];
+    }
+
+    public function fotoUrl(): ?string
+    {
+        return $this->foto ? asset('storage/' . $this->foto) : null;
+    }
+
+    public function punyaLokasi(): bool
+    {
+        return $this->latitude !== null && $this->longitude !== null;
+    }
 }
->>>>>>> origin/desti

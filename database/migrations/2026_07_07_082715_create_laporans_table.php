@@ -11,6 +11,10 @@ return new class extends Migration
         Schema::create('laporans', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
+            // Nama pelapor manual — hanya dipakai kalau laporan dibuat admin lewat
+            // "Tambah Manual" (tidak ada akun warga / user_id). Kalau laporan berasal
+            // dari akun warga, nama pelapor selalu diambil dari relasi user().
+            $table->string('pelapor')->nullable();
             $table->string('judul');
             $table->string('kategori');
             $table->string('tingkat'); // Ringan / Sedang / Berat

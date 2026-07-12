@@ -7,7 +7,10 @@
 
 <div class="form-group">
     <label for="{{ $prefix }}pelapor">Pelapor</label>
-    <input type="text" id="{{ $prefix }}pelapor" name="pelapor" required>
+    <input type="text" id="{{ $prefix }}pelapor" name="pelapor" placeholder="mis. Admin (manual)">
+    <small style="display:block; color:var(--text-secondary); font-size:11px; margin-top:4px;">
+        Otomatis terisi &amp; terkunci untuk laporan yang dikirim dari akun warga.
+    </small>
 </div>
 
 <div class="form-group">
@@ -27,6 +30,15 @@
 </div>
 
 <div class="form-group">
+    <label for="{{ $prefix }}tingkat">Tingkat Kerusakan</label>
+    <select id="{{ $prefix }}tingkat" name="tingkat" required>
+        <option value="Ringan">Ringan</option>
+        <option value="Sedang" selected>Sedang</option>
+        <option value="Berat">Berat</option>
+    </select>
+</div>
+
+<div class="form-group">
     <label for="{{ $prefix }}status">Status</label>
     <select id="{{ $prefix }}status" name="status" required>
         @foreach (\App\Models\Laporan::STATUS_OPTIONS as $opt)
@@ -36,8 +48,9 @@
 </div>
 
 <div class="form-group">
-    <label for="{{ $prefix }}tanggal">Tanggal</label>
-    <input type="date" id="{{ $prefix }}tanggal" name="tanggal" required value="{{ now()->toDateString() }}">
+    <label for="{{ $prefix }}deskripsi">Deskripsi</label>
+    <textarea id="{{ $prefix }}deskripsi" name="deskripsi" rows="3"
+              placeholder="Jelaskan kondisi kerusakan, sejak kapan, dan dampaknya bagi pengguna jalan..."></textarea>
 </div>
 
 <div class="form-group">

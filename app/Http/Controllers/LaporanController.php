@@ -30,20 +30,22 @@ class LaporanController extends Controller
      * Simpan laporan baru.
      */
     public function store(Request $request)
-    {
-        $validated = $this->validateData($request);
+{
+    $validated = $this->validateData($request);
 
-        if ($request->hasFile('foto')) {
-            $validated['foto'] = $request->file('foto')->store('laporan-foto', 'public');
-        }
-
-        $validated['user_id'] = auth()->id();
-
-        Laporan::create($validated);
-
-        return redirect()->route('laporan.index')->with('success', 'Laporan berhasil dikirim.');
+    if ($request->hasFile('foto')) {
+        $validated['foto'] = $request->file('foto')->store('laporan-foto', 'public');
     }
 
+    $validated['user_id'] = auth()->id();
+    $validated['pelapor'] = auth()->user()->name ?? 'Anonim';
+    $validated['kode'] = 'JK-' . str_pad((Laporan::max('id') + 1), 4, '0', STR_PAD_LEFT);
+    $validated['tanggal'] = now();
+
+    Laporan::create($validated);
+
+    return redirect()->route('laporan.index')->with('success', 'Laporan berhasil dikirim.');
+}
     /**
      * Tampilkan detail satu laporan.
      */
