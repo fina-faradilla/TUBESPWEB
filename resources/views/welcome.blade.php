@@ -13,7 +13,7 @@
 <body class="font-sans antialiased bg-[#0b0e14] text-white min-h-screen">
 
     <header class="border-b border-slate-800">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <a href="{{ route('landing') }}" class="flex items-center gap-2">
                 <span class="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-500 text-[#0b0e14] font-extrabold text-sm">RF</span>
                 <span>
@@ -38,29 +38,46 @@
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 sm:px-6">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <section class="py-14 sm:py-20 border-b border-dashed border-slate-800">
-            <p class="text-xs sm:text-sm font-semibold tracking-[0.2em] text-orange-500 uppercase mb-4">
-                Layanan Pelaporan Infrastruktur Jalan
-            </p>
-            <h1 class="text-3xl sm:text-5xl font-extrabold leading-tight max-w-3xl mb-6">
-                LIHAT JALAN RUSAK? LAPORKAN LEWAT SINI.
-            </h1>
-            <p class="text-slate-400 max-w-2xl mb-8 leading-relaxed">
-                RoadFix menjembatani laporan warga ke dinas terkait. Sertakan lokasi dan foto,
-                pantau statusnya sampai selesai ditangani — tanpa perlu datang ke kantor dinas.
-            </p>
+        <section class="mt-6 mb-14 rounded-3xl bg-[#131722] border border-slate-800 flex flex-row items-center justify-between gap-6 px-6 py-10 sm:px-12 sm:py-14">
+            <div class="flex-1 min-w-0">
+                <p class="text-xs sm:text-sm font-semibold tracking-[0.2em] text-orange-500 uppercase mb-4">
+                    Layanan Pelaporan Infrastruktur Jalan
+                </p>
+                <h1 class="text-2xl sm:text-4xl xl:text-6xl font-extrabold leading-tight mb-6">
+                    LIHAT JALAN RUSAK? LAPORKAN LEWAT SINI.
+                </h1>
+                <p class="text-slate-400 max-w-2xl mb-8 leading-relaxed">
+                    RoadFix menjembatani laporan warga ke dinas terkait. Sertakan lokasi dan foto,
+                    pantau statusnya sampai selesai ditangani — tanpa perlu datang ke kantor dinas.
+                </p>
 
-            <div class="flex flex-wrap gap-3">
-                <a href="{{ route('laporan.create') }}"
-                   class="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-orange-500 hover:bg-orange-400 text-[#0b0e14] font-bold">
-                    + Buat Laporan
-                </a>
-                <a href="{{ route('laporan.index') }}"
-                   class="inline-flex items-center gap-2 px-5 py-3 rounded-lg border border-slate-700 text-slate-200 hover:border-slate-500 font-semibold">
-                    Lacak Laporan Saya
-                </a>
+                <div class="flex flex-wrap gap-3">
+                    <a href="{{ route('laporan.create') }}"
+                       class="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-orange-500 hover:bg-orange-400 text-[#0b0e14] font-bold">
+                        + Buat Laporan
+                    </a>
+                    <a href="{{ route('laporan.index') }}"
+                       class="inline-flex items-center gap-2 px-5 py-3 rounded-lg border border-slate-700 text-slate-200 hover:border-slate-500 font-semibold">
+                        Lacak Laporan Saya
+                    </a>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center w-16 h-16 sm:w-32 sm:h-32 lg:w-48 lg:h-48 shrink-0">
+                <svg viewBox="0 0 440 340" class="w-full h-full" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- garis jalan panjang -->
+                    <rect x="120" y="90" width="30" height="200" rx="4" fill="#e6a817"/>
+                    <!-- garis jalan putus-putus tengah -->
+                    <rect x="200" y="90"  width="26" height="45" rx="4" fill="#e6a817"/>
+                    <rect x="200" y="150" width="26" height="45" rx="4" fill="#e6a817"/>
+                    <rect x="200" y="210" width="26" height="45" rx="4" fill="#e6a817"/>
+                    <!-- garis jalan pendek -->
+                    <rect x="280" y="90" width="30" height="120" rx="4" fill="#e6a817"/>
+                    <!-- tanda plus -->
+                    <path d="M255 235 h35 v-35 h30 v35 h35 v30 h-35 v35 h-30 v-35 h-35 z" fill="#e6a817"/>
+                </svg>
             </div>
         </section>
 
