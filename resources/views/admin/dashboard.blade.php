@@ -4,7 +4,9 @@
 @section('page-title', 'DASHBOARD')
 
 @section('top-bar-trailing')
-    <div class="search-box">🔍 Cari cepat...</div>
+    <form method="GET" action="{{ route('admin.laporan.index') }}" class="search-box">
+        🔍 <input type="text" name="q" placeholder="Cari cepat..." class="search-box-input">
+    </form>
     <div class="avatar">AD</div>
 @endsection
 

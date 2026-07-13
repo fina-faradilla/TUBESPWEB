@@ -100,15 +100,28 @@ class LaporanController extends Controller
 
     /** Tombol "Verifikasi": maju satu tahap status. */
     public function verifikasi(Laporan $laporan)
-    {
-        $next = $laporan->statusBerikutnya();
-        if ($next) {
-            $laporan->update(['status' => $next]);
-        }
+{
+    $laporan->majukanStatus();
 
-        return redirect()->route('admin.laporan.index')
-            ->with('success', 'Status laporan diperbarui menjadi ' . $laporan->status);
-    }
+    return redirect()->route('admin.laporan.index')
+        ->with('success', 'Status laporan diperbarui menjadi ' . $laporan->fresh()->status);
+}
+
+public function tolak(Request $request, Laporan $laporan)
+{
+    $request->validate([
+        'alasan' => ['nullable', 'string', 'max:500'],
+    ]);
+
+    $laporan->ubahStatus(
+        'Ditolak',
+        'Laporan ditolak',
+        $request->input('alasan', 'Laporan tidak memenuhi kriteria/tidak valid.')
+    );
+
+    return redirect()->route('admin.laporan.index')
+        ->with('success', 'Laporan telah ditolak.');
+}
 
     /** Halaman detail satu laporan. */
     public function show(Laporan $laporan): \Illuminate\View\View

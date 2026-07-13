@@ -733,3 +733,157 @@ select.filter-select:focus {
     opacity: 0.4;
     cursor: default;
 }
+
+/* ===== Sidebar Collapse (Desktop) ===== */
+.sidebar {
+    position: relative;
+    width: 240px;
+    transition: width 0.25s ease;
+}
+
+.sidebar-collapse-btn {
+    position: absolute;
+    top: 28px;
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #000;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 11px;
+    z-index: 5;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+.sidebar-collapse-btn:hover {
+    filter: brightness(0.95);
+}
+
+.sidebar.collapsed {
+    width: 76px;
+}
+.sidebar.collapsed .sidebar-logo {
+    justify-content: center;
+}
+.sidebar.collapsed .sidebar-logo-title,
+.sidebar.collapsed .sidebar-logo-sub,
+.sidebar.collapsed .sidebar-section-label,
+.sidebar.collapsed .nav-label {
+    display: none;
+}
+.sidebar.collapsed .nav-item {
+    justify-content: center;
+    padding: 9px 0;
+}
+.sidebar.collapsed .nav-item .dot {
+    display: none;
+}
+.sidebar.collapsed .nav-item i.nav-icon {
+    display: inline-block;
+}
+
+/* Ikon pengganti dot saat collapsed (disembunyikan saat sidebar terbuka) */
+.nav-icon {
+    display: none;
+    font-size: 13px;
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.sidebar.collapsed .nav-icon {
+    display: inline-block;
+}
+
+/* Sembunyikan tombol collapse di layar kecil (mobile pakai hamburger, bukan collapse) */
+@media (max-width: 992px) {
+    .sidebar-collapse-btn {
+        display: none;
+    }
+    .sidebar.collapsed {
+        width: 240px; /* reset supaya tidak konflik sama mode mobile slide */
+    }
+}
+
+/* ===== Aksi ikon (Kelola Laporan) ===== */
+.aksi-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.aksi-icons form.inline {
+    display: inline-flex;
+}
+.aksi-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+.aksi-icon:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.06);
+}
+.aksi-icon-detail:hover {
+    color: var(--text-primary);
+}
+.aksi-icon-verifikasi {
+    color: var(--blue);
+}
+.aksi-icon-verifikasi:hover {
+    background: rgba(78, 140, 245, 0.12);
+}
+.aksi-icon-tolak {
+    color: var(--red);
+}
+.aksi-icon-tolak:hover {
+    background: rgba(229, 72, 77, 0.12);
+}
+.aksi-icon-ubah:hover {
+    color: var(--text-primary);
+}
+.aksi-icon-hapus {
+    color: #f87171;
+}
+.aksi-icon-hapus:hover {
+    background: rgba(248, 113, 113, 0.12);
+}
+.aksi-icon.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.laporan-table {
+    min-width: 900px; /* jaga supaya kolom tidak dipaksa terlalu sempit */
+}
+
+.search-box-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 13px;
+    width: 100%;
+    font-family: inherit;
+}
+.search-box-input::placeholder {
+    color: var(--text-secondary);
+}
