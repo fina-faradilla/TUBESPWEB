@@ -25,7 +25,7 @@
             <nav class="flex items-center gap-2 sm:gap-3 text-sm">
                 @auth
                     <a href="{{ route('laporan.index') }}" class="px-3 py-2 text-slate-300 hover:text-white hidden sm:inline">Riwayat Laporan</a>
-                    <a href="{{ route('dashboard') }}" class="px-4 py-2 rounded-lg border border-slate-700 text-slate-200 hover:border-slate-500">Dashboard</a>
+                    <a href="{{ route('laporan.index') }}" class="px-4 py-2 rounded-lg border border-slate-700 text-slate-200 hover:border-slate-500">Dashboard</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button class="px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-400 text-[#0b0e14] font-semibold">Keluar</button>
