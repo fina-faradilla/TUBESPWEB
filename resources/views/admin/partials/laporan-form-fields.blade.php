@@ -7,15 +7,34 @@
 
 <div class="form-group">
     <label for="{{ $prefix }}pelapor">Pelapor</label>
-    <input type="text" id="{{ $prefix }}pelapor" name="pelapor" required>
+    <input type="text" id="{{ $prefix }}pelapor" name="pelapor" placeholder="mis. Admin (manual)">
+    <small style="display:block; color:var(--text-secondary); font-size:11px; margin-top:4px;">
+        Otomatis terisi &amp; terkunci untuk laporan yang dikirim dari akun warga.
+    </small>
 </div>
 
 <div class="form-group">
     <label for="{{ $prefix }}kategori">Kategori</label>
-    <select id="{{ $prefix }}kategori" name="kategori" required>
-        @foreach (\App\Models\Laporan::KATEGORI_OPTIONS as $opt)
+    <select id="{{ $prefix }}kategori" name="kategori" required onchange="toggleKategoriLain(this)">
+        @foreach (($kategoriOptions ?? []) as $opt)
             <option value="{{ $opt }}">{{ $opt }}</option>
         @endforeach
+        <option value="Lainnya">Lainnya (isi manual)</option>
+    </select>
+</div>
+
+<div class="form-group" id="{{ $prefix }}kategori_lainnya_wrap" style="display:none;">
+    <label for="{{ $prefix }}kategori_lainnya">Kategori Lainnya (isi manual)</label>
+    <input type="text" id="{{ $prefix }}kategori_lainnya" name="kategori_lainnya"
+           placeholder="mis. Trotoar Rusak" maxlength="255">
+</div>
+
+<div class="form-group">
+    <label for="{{ $prefix }}tingkat">Tingkat Kerusakan</label>
+    <select id="{{ $prefix }}tingkat" name="tingkat" required>
+        <option value="Ringan">Ringan</option>
+        <option value="Sedang" selected>Sedang</option>
+        <option value="Berat">Berat</option>
     </select>
 </div>
 
@@ -29,8 +48,9 @@
 </div>
 
 <div class="form-group">
-    <label for="{{ $prefix }}tanggal">Tanggal</label>
-    <input type="date" id="{{ $prefix }}tanggal" name="tanggal" required value="{{ now()->toDateString() }}">
+    <label for="{{ $prefix }}deskripsi">Deskripsi</label>
+    <textarea id="{{ $prefix }}deskripsi" name="deskripsi" rows="3"
+              placeholder="Jelaskan kondisi kerusakan, sejak kapan, dan dampaknya bagi pengguna jalan..."></textarea>
 </div>
 
 <div class="form-group">

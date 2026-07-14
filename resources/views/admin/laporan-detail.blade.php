@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Detail Laporan — ' . $laporan->kode)
+@section('title', 'Detail Laporan — ' . $laporan->kode_laporan)
 @section('page-title', 'DETAIL LAPORAN')
 
 @section('top-bar-trailing')
@@ -18,7 +18,7 @@
             <div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <div style="color:var(--text-secondary); font-size:12px;">{{ $laporan->kode }}</div>
+                        <div style="color:var(--text-secondary); font-size:12px;">{{ $laporan->kode_laporan }}</div>
                         <h2 style="margin:4px 0 0; font-size:20px;">{{ $laporan->judul }}</h2>
                     </div>
                     <span class="badge {{ $laporan->statusColorClass() }}">
@@ -29,21 +29,38 @@
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px;">
                     <div>
                         <div style="color:var(--text-secondary); font-size:11px; font-weight:bold;">PELAPOR</div>
-                        <div style="margin-top:4px;">{{ $laporan->pelapor }}</div>
+                        <div style="margin-top:4px;">
+                            {{ $laporan->nama_pelapor }}
+                            @if ($laporan->user_id)
+                                <span style="color:var(--text-secondary); font-size:11px;">(akun warga)</span>
+                            @endif
+                        </div>
                     </div>
                     <div>
                         <div style="color:var(--text-secondary); font-size:11px; font-weight:bold;">KATEGORI</div>
                         <div style="margin-top:4px;">{{ $laporan->kategori }}</div>
                     </div>
                     <div>
-                        <div style="color:var(--text-secondary); font-size:11px; font-weight:bold;">TANGGAL LAPOR</div>
-                        <div style="margin-top:4px;">{{ $laporan->tanggal->translatedFormat('d F Y') }}</div>
+                        <div style="color:var(--text-secondary); font-size:11px; font-weight:bold;">TINGKAT KERUSAKAN</div>
+                        <div style="margin-top:4px;">{{ $laporan->tingkat ?: '—' }}</div>
                     </div>
                     <div>
+                        <div style="color:var(--text-secondary); font-size:11px; font-weight:bold;">TANGGAL LAPOR</div>
+                        <div style="margin-top:4px;">{{ $laporan->created_at->translatedFormat('d F Y') }}</div>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
                         <div style="color:var(--text-secondary); font-size:11px; font-weight:bold;">ALAMAT</div>
                         <div style="margin-top:4px;">{{ $laporan->alamat ?: '—' }}</div>
                     </div>
                 </div>
+            </div>
+
+            {{-- ===== DESKRIPSI (sama seperti yang diisi warga saat membuat laporan) ===== --}}
+            <div class="card">
+                <div class="card-title" style="margin-bottom:12px;">DESKRIPSI</div>
+                <p style="margin:0; color:var(--text-primary); font-size:13px; line-height:1.6; white-space:pre-line;">
+                    {{ $laporan->deskripsi ?: 'Tidak ada deskripsi untuk laporan ini.' }}
+                </p>
             </div>
 
             {{-- ===== PETA LOKASI ===== --}}
@@ -66,7 +83,7 @@
         <div class="card">
             <div class="card-title" style="margin-bottom:16px;">FOTO KERUSAKAN</div>
             @if ($laporan->fotoUrl())
-                <img src="{{ $laporan->fotoUrl() }}" alt="Foto laporan {{ $laporan->kode }}"
+                <img src="{{ $laporan->fotoUrl() }}" alt="Foto laporan {{ $laporan->kode_laporan }}"
                      style="width:100%; border-radius:8px; display:block;">
             @else
                 <div style="height:200px; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:13px; border:1px dashed var(--card-border); border-radius:8px;">

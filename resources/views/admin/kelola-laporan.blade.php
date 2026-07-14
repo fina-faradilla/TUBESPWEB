@@ -30,77 +30,108 @@
         </form>
 
         {{-- ===== TABEL ===== --}}
+        <div class="table-scroll">
         <table class="laporan-table">
             <thead>
                 <tr>
-                    <th>ID</th><th>JUDUL</th><th>PELAPOR</th><th>KATEGORI</th>
-                    <th>STATUS</th><th>TANGGAL</th><th>AKSI</th>
+                    <th>ID</th><th>FOTO</th><th>JUDUL</th><th>PELAPOR</th><th>KATEGORI</th>
+                    <th>DESKRIPSI</th><th>STATUS</th><th>TANGGAL</th><th>AKSI</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($laporans as $laporan)
                     <tr>
-                        <td>{{ $laporan->kode }}</td>
-                        <td>
-                            <a href="{{ route('admin.laporan.show', $laporan) }}"
-                               style="color:var(--text-primary); text-decoration:none;">
-                                {{ $laporan->judul }}
-                            </a>
-                        </td>
-                        <td>{{ $laporan->pelapor }}</td>
+    <td>{{ $laporan->kode_laporan }}</td>
+    <td>
+        @if ($laporan->foto)
+            <img src="{{ asset('storage/'.$laporan->foto) }}"
+                 alt="Foto laporan"
+                 style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid var(--card-border);">
+        @else
+            <div style="width:48px; height:48px; border-radius:6px; background:var(--bg-dark); border:1px solid var(--card-border); display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:11px;">
+                <i class="fa-solid fa-image"></i>
+            </div>
+        @endif
+    </td>
+    <td>
+        <a href="{{ route('admin.laporan.show', $laporan) }}"
+           style="color:var(--text-primary); text-decoration:none;">
+            {{ $laporan->judul }}
+        </a>
+    </td>
+    <td>
+        {{ $laporan->nama_pelapor }}
+        @if ($laporan->user_id)
+            <span title="Laporan dari akun warga" style="color:var(--text-secondary); font-size:11px;">(warga)</span>
+        @endif
+    </td>
                         <td>{{ $laporan->kategori }}</td>
+                        <td style="max-width:220px; white-space:normal; color:var(--text-secondary); font-size:12px;">
+                            {{ $laporan->deskripsi ? \Illuminate\Support\Str::limit($laporan->deskripsi, 80) : '—' }}
+                        </td>
                         <td>
                             <span class="badge {{ $laporan->statusColorClass() }}">
                                 <span class="dot"></span>{{ $laporan->status }}
                             </span>
                         </td>
-                        <td>{{ $laporan->tanggal->translatedFormat('d M Y') }}</td>
+                        <td>{{ $laporan->created_at->translatedFormat('d M Y') }}</td>
                         <td>
-                            {{-- Detail --}}
-                           <a href="{{ route('admin.laporan.show', $laporan) }}"
-                            class="aksi-link aksi-detail">
-                                Detail
-                            </a>
+    <div class="aksi-icons">
+        {{-- Detail --}}
+        <a href="{{ route('admin.laporan.show', $laporan) }}"
+           class="aksi-icon aksi-icon-detail" title="Detail">
+            <i class="fa-solid fa-eye"></i>
+        </a>
 
-                            {{-- Verifikasi --}}
-                            <form method="POST" action="{{ route('admin.laporan.verifikasi', $laporan) }}">
-                                @csrf @method('PATCH')
-                                <button type="submit"
-                                        class="aksi-link aksi-verifikasi {{ $laporan->status === 'SELESAI' ? 'disabled' : '' }}"
-                                        {{ $laporan->status === 'SELESAI' ? 'disabled' : '' }}>
-                                    Verifikasi
-                                </button>
-                            </form>
+        {{-- Verifikasi --}}
+        <form method="POST" action="{{ route('admin.laporan.verifikasi', $laporan) }}" class="inline">
+            @csrf @method('PATCH')
+            <button type="submit"
+                    class="aksi-icon aksi-icon-verifikasi {{ in_array($laporan->status, ['Selesai', 'Ditolak']) ? 'disabled' : '' }}"
+                    title="Verifikasi"
+                    {{ in_array($laporan->status, ['Selesai', 'Ditolak']) ? 'disabled' : '' }}>
+                <i class="fa-solid fa-check"></i>
+            </button>
+        </form>
 
-                            {{-- Ubah --}}
-                            <button type="button" class="aksi-link aksi-ubah"
-                                    onclick='openEditModal(@json($laporan))'>
-                                Ubah
-                            </button>
+        {{-- Tolak --}}
+        <form method="POST" action="{{ route('admin.laporan.tolak', $laporan) }}" class="inline"
+              onsubmit="return confirm('Yakin ingin menolak laporan &quot;{{ $laporan->judul }}&quot;?');">
+            @csrf @method('PATCH')
+            <button type="submit"
+                    class="aksi-icon aksi-icon-tolak {{ in_array($laporan->status, ['Selesai', 'Ditolak']) ? 'disabled' : '' }}"
+                    title="Tolak"
+                    {{ in_array($laporan->status, ['Selesai', 'Ditolak']) ? 'disabled' : '' }}>
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </form>
 
-                            {{-- Hapus --}}
-                            <form method="POST" action="{{ route('admin.laporan.destroy', $laporan) }}"
-                                  onsubmit="return confirm('Laporan &quot;{{ $laporan->judul }}&quot; ({{ $laporan->kode }}) akan dihapus permanen. Lanjutkan?');">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="aksi-link aksi-hapus">Hapus</button>
-                            </form>
-                        </td>
+        {{-- Hapus --}}
+        <form method="POST" action="{{ route('admin.laporan.destroy', $laporan) }}" class="inline"
+              onsubmit="return confirm('Laporan &quot;{{ $laporan->judul }}&quot; ({{ $laporan->kode_laporan }}) akan dihapus permanen. Lanjutkan?');">
+            @csrf @method('DELETE')
+            <button type="submit" class="aksi-icon aksi-icon-hapus" title="Hapus">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </form>
+    </div>
+</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" style="text-align:center; color:var(--text-secondary); padding:32px 0;">
+                        <td colspan="9" style="text-align:center; color:var(--text-secondary); padding:32px 0;">
                             Tidak ada laporan yang cocok dengan pencarian/filter.
                         </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
-
+        </div>
         <p style="color:var(--text-secondary); font-size:12px; margin-top:20px;">
             Menampilkan {{ $laporans->count() }} dari {{ $totalKeseluruhan }} laporan
         </p>
 
-        <div class="pagination">{{ $laporans->links() }}</div>
+        {{ $laporans->links('vendor.pagination.custom-dark') }}
     </div>
 
     {{-- ===== MODAL TAMBAH ===== --}}
@@ -140,6 +171,25 @@
     @push('scripts')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        const KATEGORI_OPTIONS_BAKU = @json($kategoriOptions);
+
+        // Tampilkan/sembunyikan kolom "Kategori Lainnya" sesuai pilihan select.
+        function toggleKategoriLain(selectEl) {
+            const prefix = selectEl.id.replace('kategori', '');
+            const wrap = document.getElementById(prefix + 'kategori_lainnya_wrap');
+            const input = document.getElementById(prefix + 'kategori_lainnya');
+            if (!wrap || !input) return;
+
+            if (selectEl.value === 'Lainnya') {
+                wrap.style.display = '';
+                input.required = true;
+            } else {
+                wrap.style.display = 'none';
+                input.required = false;
+                input.value = '';
+            }
+        }
+
         function openModal(id) { document.getElementById(id).classList.add('open'); initMapFor(id); }
         function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
@@ -147,10 +197,34 @@
             const form = document.getElementById('form-ubah');
             form.action = "{{ url('admin/manage-report') }}/" + laporan.id;
             document.getElementById('edit_judul').value = laporan.judul;
-            document.getElementById('edit_pelapor').value = laporan.pelapor;
-            document.getElementById('edit_kategori').value = laporan.kategori;
+
+            // Pelapor: kalau laporan berasal dari akun warga, tampilkan nama akunnya
+            // tapi kunci (readonly) supaya tidak bisa "dipalsukan" lewat form admin.
+            const pelaporInput = document.getElementById('edit_pelapor');
+            pelaporInput.value = laporan.nama_pelapor || laporan.pelapor || '';
+            if (laporan.user_id) {
+                pelaporInput.setAttribute('readonly', 'readonly');
+                pelaporInput.title = 'Laporan ini berasal dari akun warga, nama pelapor mengikuti akun tersebut.';
+            } else {
+                pelaporInput.removeAttribute('readonly');
+                pelaporInput.title = '';
+            }
+
+            const kategoriSelect = document.getElementById('edit_kategori');
+            if (KATEGORI_OPTIONS_BAKU.includes(laporan.kategori)) {
+                // Kategori baku (mis. Berlubang, Retak, dst).
+                kategoriSelect.value = laporan.kategori;
+                toggleKategoriLain(kategoriSelect);
+            } else {
+                // Kategori kustom hasil isian manual sebelumnya -> pilih "Lainnya" + isi teksnya.
+                kategoriSelect.value = 'Lainnya';
+                toggleKategoriLain(kategoriSelect);
+                document.getElementById('edit_kategori_lainnya').value = laporan.kategori;
+            }
+
+            document.getElementById('edit_tingkat').value = laporan.tingkat || 'Sedang';
             document.getElementById('edit_status').value = laporan.status;
-            document.getElementById('edit_tanggal').value = laporan.tanggal.substring(0, 10);
+            document.getElementById('edit_deskripsi').value = laporan.deskripsi || '';
             document.getElementById('edit_alamat').value = laporan.alamat || '';
             document.getElementById('edit_latitude').value = laporan.latitude || '';
             document.getElementById('edit_longitude').value = laporan.longitude || '';
