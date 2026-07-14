@@ -30,29 +30,41 @@
         </form>
 
         {{-- ===== TABEL ===== --}}
+        <div class="table-scroll">
         <table class="laporan-table">
             <thead>
                 <tr>
-                    <th>ID</th><th>JUDUL</th><th>PELAPOR</th><th>KATEGORI</th>
+                    <th>ID</th><th>FOTO</th><th>JUDUL</th><th>PELAPOR</th><th>KATEGORI</th>
                     <th>DESKRIPSI</th><th>STATUS</th><th>TANGGAL</th><th>AKSI</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($laporans as $laporan)
                     <tr>
-                        <td>{{ $laporan->kode_laporan }}</td>
-                        <td>
-                            <a href="{{ route('admin.laporan.show', $laporan) }}"
-                               style="color:var(--text-primary); text-decoration:none;">
-                                {{ $laporan->judul }}
-                            </a>
-                        </td>
-                        <td>
-                            {{ $laporan->nama_pelapor }}
-                            @if ($laporan->user_id)
-                                <span title="Laporan dari akun warga" style="color:var(--text-secondary); font-size:11px;">(warga)</span>
-                            @endif
-                        </td>
+    <td>{{ $laporan->kode_laporan }}</td>
+    <td>
+        @if ($laporan->foto)
+            <img src="{{ asset('storage/'.$laporan->foto) }}"
+                 alt="Foto laporan"
+                 style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid var(--card-border);">
+        @else
+            <div style="width:48px; height:48px; border-radius:6px; background:var(--bg-dark); border:1px solid var(--card-border); display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:11px;">
+                <i class="fa-solid fa-image"></i>
+            </div>
+        @endif
+    </td>
+    <td>
+        <a href="{{ route('admin.laporan.show', $laporan) }}"
+           style="color:var(--text-primary); text-decoration:none;">
+            {{ $laporan->judul }}
+        </a>
+    </td>
+    <td>
+        {{ $laporan->nama_pelapor }}
+        @if ($laporan->user_id)
+            <span title="Laporan dari akun warga" style="color:var(--text-secondary); font-size:11px;">(warga)</span>
+        @endif
+    </td>
                         <td>{{ $laporan->kategori }}</td>
                         <td style="max-width:220px; white-space:normal; color:var(--text-secondary); font-size:12px;">
                             {{ $laporan->deskripsi ? \Illuminate\Support\Str::limit($laporan->deskripsi, 80) : '—' }}
@@ -64,46 +76,57 @@
                         </td>
                         <td>{{ $laporan->created_at->translatedFormat('d M Y') }}</td>
                         <td>
-                            {{-- Detail --}}
-                           <a href="{{ route('admin.laporan.show', $laporan) }}"
-                            class="aksi-link aksi-detail">
-                                Detail
-                            </a>
+    <div class="aksi-icons">
+        {{-- Detail --}}
+        <a href="{{ route('admin.laporan.show', $laporan) }}"
+           class="aksi-icon aksi-icon-detail" title="Detail">
+            <i class="fa-solid fa-eye"></i>
+        </a>
 
-                            {{-- Verifikasi --}}
-                            <form method="POST" action="{{ route('admin.laporan.verifikasi', $laporan) }}">
-                                @csrf @method('PATCH')
-                                <button type="submit"
-                                        class="aksi-link aksi-verifikasi {{ in_array($laporan->status, ['Selesai', 'Ditolak']) ? 'disabled' : '' }}"
-                                        {{ in_array($laporan->status, ['Selesai', 'Ditolak']) ? 'disabled' : '' }}>
-                                    Verifikasi
-                                </button>
-                            </form>
+        {{-- Verifikasi --}}
+        <form method="POST" action="{{ route('admin.laporan.verifikasi', $laporan) }}" class="inline">
+            @csrf @method('PATCH')
+            <button type="submit"
+                    class="aksi-icon aksi-icon-verifikasi {{ in_array($laporan->status, ['Selesai', 'Ditolak']) ? 'disabled' : '' }}"
+                    title="Verifikasi"
+                    {{ in_array($laporan->status, ['Selesai', 'Ditolak']) ? 'disabled' : '' }}>
+                <i class="fa-solid fa-check"></i>
+            </button>
+        </form>
 
-                            {{-- Ubah --}}
-                            <button type="button" class="aksi-link aksi-ubah"
-                                    onclick='openEditModal(@json($laporan))'>
-                                Ubah
-                            </button>
+        {{-- Tolak --}}
+        <form method="POST" action="{{ route('admin.laporan.tolak', $laporan) }}" class="inline"
+              onsubmit="return confirm('Yakin ingin menolak laporan &quot;{{ $laporan->judul }}&quot;?');">
+            @csrf @method('PATCH')
+            <button type="submit"
+                    class="aksi-icon aksi-icon-tolak {{ in_array($laporan->status, ['Selesai', 'Ditolak']) ? 'disabled' : '' }}"
+                    title="Tolak"
+                    {{ in_array($laporan->status, ['Selesai', 'Ditolak']) ? 'disabled' : '' }}>
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </form>
 
-                            {{-- Hapus --}}
-                            <form method="POST" action="{{ route('admin.laporan.destroy', $laporan) }}"
-                                  onsubmit="return confirm('Laporan &quot;{{ $laporan->judul }}&quot; ({{ $laporan->kode_laporan }}) akan dihapus permanen. Lanjutkan?');">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="aksi-link aksi-hapus">Hapus</button>
-                            </form>
-                        </td>
+        {{-- Hapus --}}
+        <form method="POST" action="{{ route('admin.laporan.destroy', $laporan) }}" class="inline"
+              onsubmit="return confirm('Laporan &quot;{{ $laporan->judul }}&quot; ({{ $laporan->kode_laporan }}) akan dihapus permanen. Lanjutkan?');">
+            @csrf @method('DELETE')
+            <button type="submit" class="aksi-icon aksi-icon-hapus" title="Hapus">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </form>
+    </div>
+</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" style="text-align:center; color:var(--text-secondary); padding:32px 0;">
+                        <td colspan="9" style="text-align:center; color:var(--text-secondary); padding:32px 0;">
                             Tidak ada laporan yang cocok dengan pencarian/filter.
                         </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
-
+        </div>
         <p style="color:var(--text-secondary); font-size:12px; margin-top:20px;">
             Menampilkan {{ $laporans->count() }} dari {{ $totalKeseluruhan }} laporan
         </p>

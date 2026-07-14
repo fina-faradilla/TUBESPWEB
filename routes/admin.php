@@ -33,6 +33,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/manage-report/{laporan}', [LaporanController::class, 'destroy'])->name('laporan.destroy');
     Route::patch('/manage-report/{laporan}/verifikasi', [LaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
     Route::get('/manage-report/{laporan}', [LaporanController::class, 'show'])->name('laporan.show');
+    Route::patch('/manage-report/{laporan}/verifikasi', [LaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
+    Route::patch('/manage-report/{laporan}/tolak', [LaporanController::class, 'tolak'])->name('laporan.tolak');
+    Route::get('/manage-report/{laporan}', [LaporanController::class, 'show'])->name('laporan.show');
 
     Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');
     Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');

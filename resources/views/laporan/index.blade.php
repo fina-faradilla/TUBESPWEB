@@ -20,6 +20,33 @@
         </div>
     </div>
 
+    {{-- ===== SEARCH & FILTER ===== --}}
+    <form method="GET" action="{{ route('laporan.index') }}"
+          class="flex flex-wrap items-center gap-3 mb-5">
+        <div class="flex-1 min-w-[220px] relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+            <input type="text" name="q" value="{{ $query }}"
+                   placeholder="Cari laporan, lokasi, atau ID..."
+                   class="w-full bg-panel2 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-accent">
+        </div>
+
+        <select name="kategori" onchange="this.form.submit()"
+                class="bg-panel2 border border-border rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-accent">
+            <option {{ $filterKategori === 'Semua Kategori' ? 'selected' : '' }}>Semua Kategori</option>
+            @foreach ($kategoriOptions as $opt)
+                <option value="{{ $opt }}" {{ $filterKategori === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+            @endforeach
+        </select>
+
+        <select name="status" onchange="this.form.submit()"
+                class="bg-panel2 border border-border rounded-lg px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-accent">
+            <option {{ $filterStatus === 'Semua Status' ? 'selected' : '' }}>Semua Status</option>
+            @foreach ($statusOptions as $opt)
+                <option value="{{ $opt }}" {{ $filterStatus === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+            @endforeach
+        </select>
+    </form>
+
     <div class="bg-panel border border-border rounded-xl overflow-hidden">
         <table class="w-full text-sm">
             <thead>
@@ -38,7 +65,7 @@
                 @forelse($laporans as $laporan)
                     <tr class="hover:bg-panel2/60">
                         <td class="px-5 py-3 text-slate-300 font-medium">
-                            RF-{{ str_pad($laporan->id + 139, 4, '0', STR_PAD_LEFT) }}
+                            {{ $laporan->kode_laporan }}
                         </td>
                         <td class="px-5 py-3">
                             @if($laporan->foto)
@@ -71,17 +98,31 @@
                             <a href="{{ route('laporan.show', $laporan->id) }}" class="text-slate-300 hover:text-accent" title="Detail">
                                 <i class="fa-solid fa-eye"></i>
                             </a>
-                            <a href="{{ route('laporan.edit', $laporan->id) }}" class="text-slate-300 hover:text-accent" title="Edit">
-                                <i class="fa-solid fa-pen"></i>
-                            </a>
-                            <form action="{{ route('laporan.destroy', $laporan->id) }}" method="POST" class="inline"
-                                  onsubmit="return confirm('Hapus laporan ini?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-slate-300 hover:text-red-400" title="Hapus">
+
+                            @if ($laporan->status === 'Menunggu Verifikasi')
+                                <a href="{{ route('laporan.edit', $laporan->id) }}" class="text-slate-300 hover:text-accent" title="Edit">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                            @else
+                                <span class="text-slate-600 cursor-not-allowed" title="Laporan sudah diverifikasi, tidak bisa diedit">
+                                    <i class="fa-solid fa-pen"></i>
+                                </span>
+                            @endif
+
+                            @if ($laporan->status === 'Menunggu Verifikasi')
+                                <form action="{{ route('laporan.destroy', $laporan->id) }}" method="POST" class="inline"
+                                      onsubmit="return confirm('Hapus laporan ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-slate-300 hover:text-red-400" title="Hapus">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            @else
+                                <span class="text-slate-600 cursor-not-allowed" title="Laporan sudah diverifikasi, tidak bisa dihapus">
                                     <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </form>
+                                </span>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -96,6 +137,6 @@
     </div>
 
     @if($laporans instanceof \Illuminate\Pagination\AbstractPaginator)
-        <div class="mt-5">{{ $laporans->links() }}</div>
+        <div class="mt-5">{{ $laporans->links('vendor.pagination.custom-dark') }}</div>
     @endif
 @endsection

@@ -19,4 +19,9 @@ class TindakLanjut extends Model
     {
         return $this->belongsTo(Laporan::class);
     }
+
+    public function tindakLanjuts()
+{
+    return $this->hasMany(TindakLanjut::class)->orderBy('created_at', 'asc');
+}
 }

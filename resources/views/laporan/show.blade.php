@@ -9,10 +9,12 @@
     <div class="flex items-start justify-between mb-1">
         <h1 class="text-2xl font-extrabold text-white uppercase">{{ $laporan->judul }}</h1>
         <div class="flex gap-2 whitespace-nowrap">
-            <a href="{{ route('laporan.edit', $laporan->id) }}"
-               class="bg-panel2 border border-border hover:border-accent text-slate-200 font-semibold px-4 py-2 rounded-lg text-sm">
-                <i class="fa-solid fa-pen mr-2"></i>Edit
-            </a>
+            @if ($laporan->status === 'Menunggu Verifikasi')
+        <a href="{{ route('laporan.edit', $laporan->id) }}"
+           class="bg-panel2 border border-border hover:border-accent text-slate-200 font-semibold px-4 py-2 rounded-lg text-sm">
+        <i class="fa-solid fa-pen mr-2"></i>Edit
+        </a>
+           @endif
             <a href="{{ route('laporan.index') }}"
                class="text-slate-300 hover:text-white font-semibold px-4 py-2 text-sm">
                 Kembali
@@ -104,14 +106,16 @@
     </div>
 
     <div class="flex gap-4 mt-6">
-        <form action="{{ route('laporan.destroy', $laporan->id) }}" method="POST"
-              onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
-            @csrf @method('DELETE')
-            <button type="submit"
-                    class="border border-red-500/40 text-red-400 hover:bg-red-500/10 font-semibold px-5 py-2.5 rounded-lg text-sm">
-                <i class="fa-solid fa-trash mr-2"></i>Hapus Laporan
-            </button>
-        </form>
+        @if ($laporan->status === 'Menunggu Verifikasi')
+    <form action="{{ route('laporan.destroy', $laporan->id) }}" method="POST"
+          onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
+        @csrf @method('DELETE')
+        <button type="submit"
+                class="border border-red-500/40 text-red-400 hover:bg-red-500/10 font-semibold px-5 py-2.5 rounded-lg text-sm">
+            <i class="fa-solid fa-trash mr-2"></i>Hapus Laporan
+        </button>
+    </form>
+@endif
     </div>
 @endsection
 

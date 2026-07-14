@@ -12,11 +12,41 @@ class LaporanController extends Controller
     /**
      * Tampilkan daftar laporan (Riwayat Laporan Saya).
      */
-    public function index()
-    {
-        $laporans = Laporan::latest()->paginate(10);
-        return view('laporan.index', compact('laporans'));
-    }
+    public function index(Request $request)
+{
+    $query = $request->input('q', '');
+    $filterKategori = $request->input('kategori', 'Semua Kategori');
+    $filterStatus = $request->input('status', 'Semua Status');
+
+    $laporans = Laporan::query()
+        ->where('user_id', auth()->id()) // hanya laporan milik warga yang login
+        ->when($query, function ($q) use ($query) {
+            $q->where(function ($sub) use ($query) {
+                $sub->where('judul', 'like', "%{$query}%")
+                    ->orWhere('alamat', 'like', "%{$query}%")
+                    ->orWhere('kode', 'like', "%{$query}%");
+            });
+        })
+        ->when($filterKategori !== 'Semua Kategori', function ($q) use ($filterKategori) {
+            $q->where('kategori', $filterKategori);
+        })
+        ->when($filterStatus !== 'Semua Status', function ($q) use ($filterStatus) {
+            $q->where('status', $filterStatus);
+        })
+        ->latest()
+        ->paginate(3)
+        ->withQueryString(); // supaya filter tetap terbawa saat pindah halaman pagination
+
+    $kategoriOptions = Laporan::where('user_id', auth()->id())
+        ->distinct()
+        ->pluck('kategori');
+
+    $statusOptions = Laporan::STATUS_OPTIONS;
+
+    return view('laporan.index', compact(
+        'laporans', 'query', 'filterKategori', 'filterStatus', 'kategoriOptions', 'statusOptions'
+    ));
+}
 
     /**
      * Tampilkan form Buat Laporan Baru.
@@ -42,7 +72,13 @@ class LaporanController extends Controller
     $validated['kode'] = 'JK-' . str_pad((Laporan::max('id') + 1), 4, '0', STR_PAD_LEFT);
     $validated['tanggal'] = now();
 
-    Laporan::create($validated);
+    $laporan = Laporan::create($validated);
+
+    // Catat log pertama supaya langsung muncul di "Riwayat Tindak Lanjut"
+    $laporan->tindakLanjuts()->create([
+        'judul'      => 'Laporan diterima',
+        'keterangan' => 'Masuk ke sistem dan menunggu verifikasi admin.',
+    ]);
 
     return redirect()->route('laporan.index')->with('success', 'Laporan berhasil dikirim.');
 }
@@ -50,49 +86,65 @@ class LaporanController extends Controller
      * Tampilkan detail satu laporan.
      */
     public function show(Laporan $laporan)
-    {
-        return view('laporan.show', compact('laporan'));
-    }
+{
+    $laporan->load('tindakLanjuts');
+    return view('laporan.show', compact('laporan'));
+}
 
     /**
      * Tampilkan form edit laporan.
      */
     public function edit(Laporan $laporan)
-    {
-        return view('laporan.edit', compact('laporan'));
+{
+    if ($laporan->status !== 'Menunggu Verifikasi') {
+        return redirect()->route('laporan.index')
+            ->with('error', 'Laporan yang sudah diverifikasi/ditolak tidak dapat diubah lagi.');
     }
+
+    return view('laporan.edit', compact('laporan'));
+}
 
     /**
      * Update laporan.
      */
-    public function update(Request $request, Laporan $laporan)
-    {
-        $validated = $this->validateData($request);
-
-        if ($request->hasFile('foto')) {
-            if ($laporan->foto) {
-                Storage::disk('public')->delete($laporan->foto);
-            }
-            $validated['foto'] = $request->file('foto')->store('laporan-foto', 'public');
-        }
-
-        $laporan->update($validated);
-
-        return redirect()->route('laporan.index')->with('success', 'Laporan berhasil diperbarui.');
+   public function update(Request $request, Laporan $laporan)
+{
+    if ($laporan->status !== 'Menunggu Verifikasi') {
+        return redirect()->route('laporan.index')
+            ->with('error', 'Laporan yang sudah diverifikasi/ditolak tidak dapat diubah lagi.');
     }
+
+    $validated = $this->validateData($request);
+
+    if ($request->hasFile('foto')) {
+        if ($laporan->foto) {
+            Storage::disk('public')->delete($laporan->foto);
+        }
+        $validated['foto'] = $request->file('foto')->store('laporan-foto', 'public');
+    }
+
+    $laporan->update($validated);
+
+    return redirect()->route('laporan.index')->with('success', 'Laporan berhasil diperbarui.');
+}
 
     /**
      * Hapus laporan.
      */
     public function destroy(Laporan $laporan)
-    {
-        if ($laporan->foto) {
-            Storage::disk('public')->delete($laporan->foto);
-        }
-        $laporan->delete();
-
-        return redirect()->route('laporan.index')->with('success', 'Laporan berhasil dihapus.');
+{
+    if ($laporan->status !== 'Menunggu Verifikasi') {
+        return redirect()->route('laporan.index')
+            ->with('error', 'Laporan yang sudah diverifikasi/ditolak tidak dapat dihapus.');
     }
+
+    if ($laporan->foto) {
+        Storage::disk('public')->delete($laporan->foto);
+    }
+    $laporan->delete();
+
+    return redirect()->route('laporan.index')->with('success', 'Laporan berhasil dihapus.');
+}
 
     /**
      * Validasi input form laporan.

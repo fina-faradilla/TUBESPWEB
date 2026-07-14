@@ -151,4 +151,41 @@ class Laporan extends Model
     {
         return $this->latitude !== null && $this->longitude !== null;
     }
+
+    /**
+     * Ubah status laporan SEKALIGUS mencatat ke riwayat tindak lanjut,
+     * supaya timeline di sisi warga (Detail Laporan) otomatis ter-update.
+     * Dipakai admin (Kelola Laporan) untuk tombol Verifikasi/Ubah Status/Tolak.
+     */
+    public function ubahStatus(string $statusBaru, string $judulLog, ?string $keterangan = null): void
+    {
+        $this->update(['status' => $statusBaru]);
+
+        $this->tindakLanjuts()->create([
+            'judul'      => $judulLog,
+            'keterangan' => $keterangan,
+        ]);
+    }
+
+    /**
+     * Shortcut khusus tombol "Verifikasi" — otomatis maju satu tahap
+     * (Menunggu Verifikasi -> Diproses -> Selesai) sesuai STATUS_FLOW,
+     * lalu mencatat log dengan judul yang sesuai tahap tersebut.
+     */
+    public function majukanStatus(?string $keterangan = null): void
+    {
+        $statusBaru = $this->statusBerikutnya();
+
+        if (! $statusBaru) {
+            return; // sudah di status terakhir, tidak ada yang dimajukan
+        }
+
+        $judulLog = match ($statusBaru) {
+            'Diproses' => 'Diverifikasi oleh Admin',
+            'Selesai'  => 'Perbaikan selesai',
+            default    => 'Status diperbarui',
+        };
+
+        $this->ubahStatus($statusBaru, $judulLog, $keterangan);
+    }
 }
