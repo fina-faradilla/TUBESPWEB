@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers;
 
+<<<<<<< HEAD
 use App\Models\Laporan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+=======
+use Illuminate\Http\Request;
+>>>>>>> origin/fina
 
 class LaporanController extends Controller
 {
     /**
+<<<<<<< HEAD
      * Tampilkan daftar laporan (Riwayat Laporan Saya).
      */
     public function index(Request $request)
@@ -197,4 +202,20 @@ public function forceDelete($id)
         ->route('laporan.trashed')
         ->with('success', 'Laporan dihapus permanen.');
 }
+=======
+     * Riwayat Laporan Saya (placeholder — akan diganti dengan data laporan milik user).
+     */
+    public function index(Request $request)
+    {
+        return view('laporan.index');
+    }
+
+    /**
+     * Buat Laporan (placeholder — akan diganti dengan form + penyimpanan laporan).
+     */
+    public function create(Request $request)
+    {
+        return view('laporan.create');
+    }
+>>>>>>> origin/fina
 }
