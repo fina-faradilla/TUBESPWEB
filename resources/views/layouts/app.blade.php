@@ -32,5 +32,5 @@
                 {{ $slot }}
             </main>
         </div>
-    </body>
+</body>
 </html>

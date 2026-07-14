@@ -1,3 +1,291 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#171b22;
+    color:#ffffff;
+}
+
+/* =======================
+   WRAPPER
+======================= */
+
+.wrapper{
+    display:flex;
+    min-height:100vh;
+}
+
+/* =======================
+   SIDEBAR
+======================= */
+
+.sidebar{
+    width:260px;
+    background:#20252f;
+    padding:30px 20px;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-bottom:40px;
+}
+
+.logo-icon{
+    width:45px;
+    height:45px;
+    background:#f7b500;
+    color:#000;
+    border-radius:10px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:bold;
+    font-size:18px;
+}
+
+.logo h2{
+    font-size:24px;
+    margin-bottom:3px;
+}
+
+.logo small{
+    color:#9da5b3;
+    font-size:12px;
+}
+
+.menu-title{
+    margin:25px 0 12px;
+    color:#8f97a5;
+    font-size:13px;
+    font-weight:600;
+    text-transform:uppercase;
+}
+
+.sidebar ul{
+    list-style:none;
+}
+
+.sidebar li{
+    margin-bottom:8px;
+}
+
+.sidebar a{
+    display:block;
+    color:#d4dae4;
+    text-decoration:none;
+    padding:12px 15px;
+    border-radius:10px;
+    transition:.3s;
+}
+
+.sidebar a:hover{
+    background:#2b313d;
+}
+
+.sidebar .active a{
+    background:#f7b500;
+    color:#000;
+    font-weight:600;
+}
+
+/* =======================
+   CONTENT
+======================= */
+
+.content{
+    flex:1;
+    padding:40px;
+}
+
+.kode{
+    color:#f7b500;
+    font-size:14px;
+    font-weight:bold;
+    letter-spacing:1px;
+}
+
+.content h1{
+    margin-top:10px;
+    font-size:42px;
+    font-weight:700;
+}
+
+.alamat{
+    margin-top:8px;
+    margin-bottom:30px;
+    color:#b7bec8;
+}
+
+/* =======================
+   GRID
+======================= */
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 370px;
+    gap:25px;
+}
+
+/* =======================
+   CARD
+======================= */
+
+.card{
+    background:#232a35;
+    border-radius:15px;
+    padding:20px;
+}
+
+/* =======================
+   FOTO
+======================= */
+
+.foto{
+    width:100%;
+    height:320px;
+    background:#161b22;
+    border-radius:12px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#9fa8b7;
+    overflow:hidden;
+    margin-bottom:20px;
+}
+
+.foto img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* =======================
+   ROW
+======================= */
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:20px;
+}
+
+.row small{
+    color:#8d95a3;
+    display:block;
+    margin-bottom:5px;
+}
+
+.row h3{
+    font-size:20px;
+}
+
+/* =======================
+   BADGE
+======================= */
+
+.badge{
+    display:inline-block;
+    padding:7px 16px;
+    background:#652d2d;
+    color:#ffb5b5;
+    border-radius:30px;
+    font-size:13px;
+    font-weight:600;
+}
+
+/* =======================
+   DESKRIPSI
+======================= */
+
+.deskripsi small{
+    color:#8d95a3;
+    display:block;
+    margin-bottom:10px;
+}
+
+.deskripsi p{
+    line-height:1.7;
+    color:#d6dce6;
+}
+
+/* =======================
+   TIMELINE
+======================= */
+
+.timeline-title{
+    margin-bottom:25px;
+    font-size:22px;
+}
+
+.timeline{
+    border-left:2px solid #3d4552;
+    margin-left:8px;
+    padding-left:22px;
+}
+
+.item{
+    position:relative;
+    margin-bottom:35px;
+}
+
+.dot{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:#f7b500;
+    position:absolute;
+    left:-29px;
+    top:5px;
+}
+
+.item small{
+    color:#8d95a3;
+}
+
+.item h4{
+    margin:5px 0;
+    font-size:20px;
+}
+
+.item p{
+    color:#c8d0dc;
+    line-height:1.6;
+}
+
+/* =======================
+   RESPONSIVE
+======================= */
+
+@media(max-width:992px){
+
+    .wrapper{
+        flex-direction:column;
+    }
+
+    .sidebar{
+        width:100%;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .content{
+        padding:20px;
+    }
+
+    .content h1{
+        font-size:32px;
+    }
+
+}
