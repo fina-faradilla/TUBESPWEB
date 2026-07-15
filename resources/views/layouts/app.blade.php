@@ -55,7 +55,18 @@
 
     <nav class="px-3 py-5 flex flex-col justify-between" style="min-height: calc(100vh - 89px);">
     <div>
-        <p id="sidebar-section-label" class="text-[11px] font-bold text-slate-500 uppercase px-3 mb-2 tracking-wider whitespace-nowrap overflow-hidden">Portal Warga</p>
+        <p id="sidebar-section-label"
+   class="text-[11px] font-bold px-3 mb-2 tracking-wider whitespace-nowrap overflow-hidden">
+
+    <span class="uppercase text-slate-500">
+        Portal Warga
+    </span>
+
+    <span class="text-white font-semibold normal-case">
+        | {{ auth()->user()->name }}
+    </span>
+
+</p>
 
         <a href="{{ route('laporan.create') }}" title="Buat Laporan"
            class="nav-link {{ request()->routeIs('laporan.create') ? 'active' : '' }} flex items-center gap-3 px-3 py-2.5 rounded-md text-sm whitespace-nowrap overflow-hidden">
@@ -146,9 +157,6 @@
         });
     </script>
 
-    @stack('scripts')
-</body>
-</html>
     @stack('scripts')
 </body>
 </html>

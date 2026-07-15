@@ -16,80 +16,119 @@
     {{-- ===== SIDEBAR ===== --}}
     <aside class="sidebar" id="sidebar">
 
-    {{-- Tombol collapse (khusus desktop) --}}
-    <button type="button" class="sidebar-collapse-btn" id="sidebarCollapseBtn" aria-label="Collapse sidebar">
-        <i class="fa-solid fa-chevron-left" id="sidebarCollapseIcon"></i>
-    </button>
+        {{-- Tombol collapse (khusus desktop) --}}
+        <button type="button" class="sidebar-collapse-btn" id="sidebarCollapseBtn" aria-label="Collapse sidebar">
+            <i class="fa-solid fa-chevron-left" id="sidebarCollapseIcon"></i>
+        </button>
 
-    <div class="sidebar-logo">
-        <div class="sidebar-logo-badge">RF</div>
-        <div>
-            <div class="sidebar-logo-title">ROADFIX</div>
-            <div class="sidebar-logo-sub">JEMBATAN LAPOR JALAN<br>RUSAK</div>
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-badge">RF</div>
+            <div>
+                <div class="sidebar-logo-title">ROADFIX</div>
+                <div class="sidebar-logo-sub">JEMBATAN LAPOR JALAN<br>RUSAK</div>
+            </div>
         </div>
-    </div>
 
-    <div class="sidebar-section-label">PORTAL ADMIN / DINAS</div>
-    <a href="{{ route('admin.dashboard') }}"
-       class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-        <span class="dot"></span>
-        <i class="fa-solid fa-chart-line nav-icon"></i>
-        <span class="nav-label">Dashboard</span>
-    </a>
-    <a href="{{ route('admin.laporan.index') }}"
-       class="nav-item {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
-        <span class="dot"></span>
-        <i class="fa-solid fa-clipboard-list nav-icon"></i>
-        <span class="nav-label">Kelola Laporan</span>
-    </a>
-    <a href="{{ route('admin.kategori.index') }}"
-       class="nav-item {{ request()->routeIs('admin.kategori.*') ? 'active' : '' }}">
-        <span class="dot"></span>
-        <i class="fa-solid fa-tags nav-icon"></i>
-        <span class="nav-label">Kelola Kategori</span>
-    </a>
+        <div class="sidebar-section-label">PORTAL ADMIN / DINAS</div>
 
-    {{-- ===== LOGOUT ===== --}}
-    <div class="sidebar-footer">
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
-            @csrf
-        </form>
-        <a href="#" class="nav-item nav-item-logout"
-           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="fa-solid fa-right-from-bracket nav-icon"></i>
-            <span class="nav-label">Logout</span>
+        <a href="{{ route('admin.dashboard') }}"
+           class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            <span class="dot"></span>
+            <i class="fa-solid fa-chart-line nav-icon"></i>
+            <span class="nav-label">Dashboard</span>
         </a>
-    </div>
-</aside>
+
+        <a href="{{ route('admin.laporan.index') }}"
+           class="nav-item {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
+            <span class="dot"></span>
+            <i class="fa-solid fa-clipboard-list nav-icon"></i>
+            <span class="nav-label">Kelola Laporan</span>
+        </a>
+
+        <a href="{{ route('admin.kategori.index') }}"
+           class="nav-item {{ request()->routeIs('admin.kategori.*') ? 'active' : '' }}">
+            <span class="dot"></span>
+            <i class="fa-solid fa-tags nav-icon"></i>
+            <span class="nav-label">Kelola Kategori</span>
+        </a>
+
+        {{-- ===== LOGOUT ===== --}}
+        <div class="sidebar-footer">
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
+                @csrf
+            </form>
+
+            <a href="#"
+               class="nav-item nav-item-logout"
+               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i class="fa-solid fa-right-from-bracket nav-icon"></i>
+                <span class="nav-label">Logout</span>
+            </a>
+        </div>
+
+    </aside>
 
     {{-- ===== MAIN ===== --}}
     <div class="admin-main">
+
         <div class="top-bar">
+
             <div class="top-bar-leading">
+
                 {{-- Tombol hamburger --}}
                 <button type="button" class="hamburger-btn" id="sidebarToggle" aria-label="Toggle menu">
                     <span></span>
                     <span></span>
                     <span></span>
                 </button>
+
                 <div>
                     <div class="breadcrumb">PORTAL ADMIN / DINAS</div>
                     <div class="page-title">@yield('page-title')</div>
                 </div>
+
             </div>
+
             <div class="top-bar-trailing">
+
                 @yield('top-bar-trailing')
+
+                @auth
+                <div style="display:flex;align-items:center;gap:10px;margin-left:20px;">
+                    <div style="text-align:right;">
+                        <div style="font-weight:600;font-size:14px;">
+                            {{ auth()->user()->name }}
+                        </div>
+
+                        <div style="font-size:12px;color:#888;">
+                            {{ auth()->user()->getRoleNames()->first() }}
+                        </div>
+                    </div>
+
+                    <div class="avatar">
+                        {{ strtoupper(substr(auth()->user()->name,0,1)) }}
+                    </div>
+                </div>
+                @endauth
+
             </div>
+
         </div>
 
         <div class="content-area">
-            @if (session('success'))
-                <div class="alert-success">{{ session('success') }}</div>
+
+            @if(session('success'))
+                <div class="alert-success">
+                    {{ session('success') }}
+                </div>
             @endif
 
             @yield('content')
+
         </div>
+
     </div>
+
 </div>
 
 <script>
@@ -99,7 +138,7 @@
     const collapseBtn = document.getElementById('sidebarCollapseBtn');
     const collapseIcon = document.getElementById('sidebarCollapseIcon');
 
-    // ---- Mobile: slide in/out (sudah ada sebelumnya) ----
+    // ---- Mobile ----
     sidebarToggle.addEventListener('click', () => {
         sidebar.classList.toggle('sidebar-open');
         sidebarOverlay.classList.toggle('active');
@@ -110,7 +149,7 @@
         sidebarOverlay.classList.remove('active');
     });
 
-    // ---- Desktop: collapse ke mode ikon ----
+    // ---- Desktop ----
     function setCollapsed(collapsed) {
         sidebar.classList.toggle('collapsed', collapsed);
         collapseIcon.classList.toggle('fa-chevron-left', !collapsed);
@@ -126,5 +165,6 @@
 </script>
 
 @stack('scripts')
+
 </body>
 </html>
