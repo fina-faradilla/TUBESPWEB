@@ -28,9 +28,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('laporan.index', absolute: false));
-    }
+        $user = auth()->user();
 
+        if ($user->hasRole('Admin')) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('laporan.index');
+    } 
     /**
      * Destroy an authenticated session.
      */

@@ -24,7 +24,11 @@ use Illuminate\Support\Facades\Route;
 |     });
 */
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:Admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/manage-report', [LaporanController::class, 'index'])->name('laporan.index');
