@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Laporan;
+use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class LaporanController extends Controller
 {
@@ -53,7 +55,8 @@ class LaporanController extends Controller
      */
     public function create()
     {
-        return view('laporan.create');
+        $kategoriOptions = Kategori::orderBy('nama')->pluck('nama');
+        return view('laporan.create', compact('kategoriOptions'));
     }
 
     /**
@@ -102,7 +105,8 @@ class LaporanController extends Controller
                 ->with('error', 'Laporan yang sudah diverifikasi/ditolak tidak dapat diubah lagi.');
         }
 
-        return view('laporan.edit', compact('laporan'));
+        $kategoriOptions = Kategori::orderBy('nama')->pluck('nama');
+        return view('laporan.edit', compact('laporan', 'kategoriOptions'));
     }
 
     /**
@@ -130,7 +134,9 @@ class LaporanController extends Controller
     }
 
     /**
-     * Hapus laporan.
+     * Hapus laporan (soft delete).
+     * PENTING: jangan hapus file foto di sini — ini cuma soft delete,
+     * file fisik baru boleh dihapus permanen lewat forceDelete().
      */
     public function destroy(Laporan $laporan)
     {
@@ -139,9 +145,6 @@ class LaporanController extends Controller
                 ->with('error', 'Laporan yang sudah diverifikasi/ditolak tidak dapat dihapus.');
         }
 
-        if ($laporan->foto) {
-            Storage::disk('public')->delete($laporan->foto);
-        }
         $laporan->delete();
 
         return redirect()->route('laporan.index')->with('success', 'Laporan berhasil dihapus.');
@@ -152,16 +155,28 @@ class LaporanController extends Controller
      */
     private function validateData(Request $request): array
     {
-        return $request->validate([
-            'judul'     => ['required', 'string', 'max:255'],
-            'kategori'  => ['required', 'string', 'max:100'],
-            'tingkat'   => ['required', 'in:Ringan,Sedang,Berat'],
-            'alamat'    => ['required', 'string', 'max:255'],
-            'deskripsi' => ['nullable', 'string'],
-            'foto'      => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
-            'latitude'  => ['nullable', 'numeric'],
-            'longitude' => ['nullable', 'numeric'],
+        $kategoriTerdaftar = Kategori::pluck('nama')->push('Lainnya')->toArray();
+
+        $data = $request->validate([
+            'judul'            => ['required', 'string', 'max:255'],
+            'kategori'         => ['required', 'string', Rule::in($kategoriTerdaftar)],
+            'kategori_lainnya' => ['required_if:kategori,Lainnya', 'nullable', 'string', 'max:100'],
+            'tingkat'          => ['required', 'in:Ringan,Sedang,Berat'],
+            'alamat'           => ['required', 'string', 'max:255'],
+            'deskripsi'        => ['nullable', 'string'],
+            'foto'             => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'latitude'         => ['nullable', 'numeric'],
+            'longitude'        => ['nullable', 'numeric'],
         ]);
+
+        if ($data['kategori'] === 'Lainnya' && !empty($data['kategori_lainnya'])) {
+            $namaBaru = trim($data['kategori_lainnya']);
+            Kategori::firstOrCreate(['nama' => $namaBaru]);
+            $data['kategori'] = $namaBaru;
+        }
+        unset($data['kategori_lainnya']);
+
+        return $data;
     }
 
     public function trashed()

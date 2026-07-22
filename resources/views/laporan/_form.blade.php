@@ -20,12 +20,20 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-slate-200 mb-2">Kategori Kerusakan</label>
-                    <select name="kategori" class="w-full bg-panel2 border border-border rounded-lg px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-accent">
-                        @foreach(['Jalan Berlubang','Jalan Retak','Jalan Ambles','Aspal Terkelupas','Jembatan Rusak','Lainnya'] as $kat)
+                    <select name="kategori" id="kategori-select" class="w-full bg-panel2 border border-border rounded-lg px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-accent">
+                        @foreach($kategoriOptions as $kat)
                             <option value="{{ $kat }}" {{ old('kategori', $laporan->kategori ?? '') == $kat ? 'selected' : '' }}>{{ $kat }}</option>
                         @endforeach
+                        <option value="Lainnya" {{ old('kategori', $laporan->kategori ?? '') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
                     </select>
                     @error('kategori')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
+
+                    <div id="kategori-lainnya-wrap" class="mt-2 {{ old('kategori') == 'Lainnya' ? '' : 'hidden' }}">
+                        <input type="text" name="kategori_lainnya" value="{{ old('kategori_lainnya') }}"
+                               placeholder="Tulis kategori baru..."
+                               class="w-full bg-panel2 border border-border rounded-lg px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-accent">
+                        @error('kategori_lainnya')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-200 mb-2">Tingkat Kerusakan</label>
@@ -136,7 +144,6 @@
     let geocodeTimer = null;
     let skipNextReverseGeocode = false;
 
-    // Reverse geocode: koordinat -> isi otomatis kotak alamat
     function reverseGeocode(lat, lng) {
         if (skipNextReverseGeocode) { skipNextReverseGeocode = false; return; }
         geocodeStatus.textContent = 'Mencari nama alamat...';
@@ -153,7 +160,6 @@
             .catch(() => { geocodeStatus.textContent = ''; });
     }
 
-    // Forward geocode: teks alamat -> pindahkan marker & peta
     function geocodeAddress(query) {
         if (!query || query.trim().length < 3) return;
         geocodeStatus.textContent = 'Mencari lokasi di peta...';
@@ -163,7 +169,7 @@
                 if (data && data.length > 0) {
                     const lat = parseFloat(data[0].lat);
                     const lng = parseFloat(data[0].lon);
-                    skipNextReverseGeocode = true; 
+                    skipNextReverseGeocode = true;
                     map.setView([lat, lng], 16);
                     marker.setLatLng([lat, lng]);
                     updateLatLng(lat, lng);
@@ -175,7 +181,6 @@
             .catch(() => { geocodeStatus.textContent = 'Gagal menghubungi layanan peta.'; });
     }
 
-    // Debounce: tunggu user berhenti mengetik ~800ms sebelum mencari
     alamatInput.addEventListener('input', function () {
         clearTimeout(geocodeTimer);
         geocodeTimer = setTimeout(() => geocodeAddress(alamatInput.value), 800);
@@ -250,6 +255,13 @@
             fotoInput.files = e.dataTransfer.files;
             showPreview(file);
         }
+    });
+
+    // ---- Toggle input "Kategori Lainnya" ----
+    const kategoriSelect = document.getElementById('kategori-select');
+    const kategoriLainnyaWrap = document.getElementById('kategori-lainnya-wrap');
+    kategoriSelect.addEventListener('change', function () {
+        kategoriLainnyaWrap.classList.toggle('hidden', this.value !== 'Lainnya');
     });
 })();
 </script>
