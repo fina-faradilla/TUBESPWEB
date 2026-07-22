@@ -25,26 +25,30 @@ Route::middleware(['auth', 'role:Admin'])
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        // ===== Kelola Laporan =====
-        Route::get('/manage-report', [LaporanController::class, 'index'])->name('laporan.index');
-        Route::post('/manage-report', [LaporanController::class, 'store'])->name('laporan.store');
-        Route::get('/manage-report/{laporan}', [LaporanController::class, 'show'])->name('laporan.show');
-        Route::put('/manage-report/{laporan}', [LaporanController::class, 'update'])->name('laporan.update');
-        Route::delete('/manage-report/{laporan}', [LaporanController::class, 'destroy'])->name('laporan.destroy');
-        Route::patch('/manage-report/{laporan}/verifikasi', [LaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
-        Route::patch('/manage-report/{laporan}/tolak', [LaporanController::class, 'tolak'])->name('laporan.tolak');
+        // ===== Kelola Laporan (butuh permission: kelola laporan) =====
+        Route::middleware('permission:kelola laporan')->group(function () {
+            Route::get('/manage-report', [LaporanController::class, 'index'])->name('laporan.index');
+            Route::post('/manage-report', [LaporanController::class, 'store'])->name('laporan.store');
+            Route::get('/manage-report/{laporan}', [LaporanController::class, 'show'])->name('laporan.show');
+            Route::put('/manage-report/{laporan}', [LaporanController::class, 'update'])->name('laporan.update');
+            Route::delete('/manage-report/{laporan}', [LaporanController::class, 'destroy'])->name('laporan.destroy');
+            Route::patch('/manage-report/{laporan}/verifikasi', [LaporanController::class, 'verifikasi'])->name('laporan.verifikasi');
+            Route::patch('/manage-report/{laporan}/tolak', [LaporanController::class, 'tolak'])->name('laporan.tolak');
 
-        // ===== Riwayat Tindak Lanjut (per laporan) =====
-        Route::post('/manage-report/{laporan}/tindak-lanjut', [TindakLanjutController::class, 'store'])
-            ->name('laporan.tindak-lanjut.store');
-        Route::put('/manage-report/{laporan}/tindak-lanjut/{tindakLanjut}', [TindakLanjutController::class, 'update'])
-            ->name('laporan.tindak-lanjut.update');
-        Route::delete('/manage-report/{laporan}/tindak-lanjut/{tindakLanjut}', [TindakLanjutController::class, 'destroy'])
-            ->name('laporan.tindak-lanjut.destroy');
+            // ===== Riwayat Tindak Lanjut (per laporan) =====
+            Route::post('/manage-report/{laporan}/tindak-lanjut', [TindakLanjutController::class, 'store'])
+                ->name('laporan.tindak-lanjut.store');
+            Route::put('/manage-report/{laporan}/tindak-lanjut/{tindakLanjut}', [TindakLanjutController::class, 'update'])
+                ->name('laporan.tindak-lanjut.update');
+            Route::delete('/manage-report/{laporan}/tindak-lanjut/{tindakLanjut}', [TindakLanjutController::class, 'destroy'])
+                ->name('laporan.tindak-lanjut.destroy');
+        });
 
-        // ===== Kelola Kategori =====
-        Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');
-        Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
-        Route::put('/kategori/{kategori}', [KategoriController::class, 'update'])->name('kategori.update');
-        Route::delete('/kategori/{kategori}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
+        // ===== Kelola Kategori (butuh permission: kelola kategori) =====
+        Route::middleware('permission:kelola kategori')->group(function () {
+            Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');
+            Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
+            Route::put('/kategori/{kategori}', [KategoriController::class, 'update'])->name('kategori.update');
+            Route::delete('/kategori/{kategori}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
+        });
     });
